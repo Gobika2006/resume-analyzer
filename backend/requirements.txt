@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+scikit-learn
+pymupdf
+python-docx
+pytesseract
+pillow
+openai
