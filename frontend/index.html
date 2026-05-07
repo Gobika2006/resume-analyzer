@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🚀 AI Resume Analyzer</h1>
+
+    <form id="form">
+
+        <label>Upload Resume</label>
+        <input type="file" id="resume" required>
+
+        <label>Job Description</label>
+
+        <textarea
+            id="jd"
+            placeholder="Paste job description..."
+            required
+        ></textarea>
+
+        <button type="submit">
+            Analyze Resume
+        </button>
+
+    </form>
+
+    <div id="loader" class="hidden">
+        Analyzing...
+    </div>
+
+    <div id="result" class="hidden">
+
+        <h2>Result</h2>
+
+        <div class="score-box">
+
+            <p>ATS Score</p>
+
+            <div class="progress">
+                <div id="progress-bar"></div>
+            </div>
+
+            <h3 id="atsScore"></h3>
+
+        </div>
+
+        <div class="details">
+
+            <p>
+                <strong>Keyword Score:</strong>
+                <span id="keywordScore"></span>
+            </p>
+
+            <p>
+                <strong>Semantic Score:</strong>
+                <span id="semanticScore"></span>
+            </p>
+
+        </div>
+
+        <div class="skills">
+
+            <h3>Missing Skills</h3>
+
+            <ul id="skillsList"></ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+document.getElementById("form").onsubmit =
+async function(e) {
+
+    e.preventDefault();
+
+    let file =
+        document.getElementById("resume").files[0];
+
+    let jd =
+        document.getElementById("jd").value;
+
+    let formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append("job_description", jd);
+
+    document.getElementById("loader")
+        .classList.remove("hidden");
+
+    document.getElementById("result")
+        .classList.add("hidden");
+
+    let res = await fetch(
+        "http://127.0.0.1:8000/analyze",
+        {
+            method: "POST",
+            body: formData
+        }
+    );
+
+    let data = await res.json();
+
+    document.getElementById("loader")
+        .classList.add("hidden");
+
+    document.getElementById("result")
+        .classList.remove("hidden");
+
+    document.getElementById("atsScore")
+        .innerText = data["ATS Score"] + "%";
+
+    document.getElementById("keywordScore")
+        .innerText = data["Keyword Score"];
+
+    document.getElementById("semanticScore")
+        .innerText = data["Semantic Score"];
+
+    document.getElementById("progress-bar")
+        .style.width = data["ATS Score"] + "%";
+
+    let skillsHTML = "";
+
+    data["Missing Skills"].forEach(skill => {
+
+        skillsHTML += `<li>${skill}</li>`;
+
+    });
+
+    document.getElementById("skillsList")
+        .innerHTML = skillsHTML;
+};
+
+</script>
+
+</body>
+</html>
